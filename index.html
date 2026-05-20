@@ -87,67 +87,68 @@
     Published by AQA.
   </div>
 
-  <script>
+ <script>
 
-    const canvas = document.getElementById("trail");
-    const ctx = canvas.getContext("2d");
+  const canvas = document.getElementById("trail");
+  const ctx = canvas.getContext("2d");
 
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let trail = [];
+
+  window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+  });
 
-    let particles = [];
+  document.addEventListener("mousemove", (e) => {
 
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    trail.push({
+      x: e.clientX,
+      y: e.clientY,
+      life: 1
     });
 
-    document.addEventListener("mousemove", (e) => {
+  });
 
-      particles.push({
-        x: e.clientX,
-        y: e.clientY,
-        alpha: 1,
-        size: 5
-      });
+  function animate() {
 
-    });
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    function animate() {
+    ctx.lineWidth = 4;
+    ctx.lineCap = "round";
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < trail.length - 1; i++) {
 
-      for (let i = 0; i < particles.length; i++) {
+      let p1 = trail[i];
+      let p2 = trail[i + 1];
 
-        let p = particles[i];
+      ctx.beginPath();
 
-        ctx.beginPath();
+      ctx.strokeStyle = `rgba(120, 0, 0, ${p1.life})`;
 
-        ctx.fillStyle = `rgba(120, 0, 0, ${p.alpha})`;
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "darkred";
 
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = "darkred";
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
 
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.stroke();
 
-        ctx.fill();
+      p1.life -= 0.0025;
 
-        p.alpha -= 0.003;
-
-        if (p.alpha <= 0) {
-          particles.splice(i, 1);
-          i--;
-        }
-
+      if (p1.life <= 0) {
+        trail.splice(i, 1);
+        i--;
       }
-
-      requestAnimationFrame(animate);
 
     }
 
-    animate();
+    requestAnimationFrame(animate);
 
-  </script>
+  }
 
-</body>
-</html>
+  animate();
+
+</script>
